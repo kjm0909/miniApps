@@ -1,9 +1,8 @@
 package com.mini.apps.series.NewsTTS;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -57,6 +55,7 @@ public class NewsActivity extends AppCompatActivity{
     public class NewsItem{
         private String mNewsTitle;
         private String mNewsSub;
+        private String mNewsLink;
 
         public NewsItem(){
 
@@ -83,6 +82,14 @@ public class NewsActivity extends AppCompatActivity{
 
         public void setNewsTitle(String mNewsTitle) {
             this.mNewsTitle = mNewsTitle;
+        }
+
+        public String getNewsLink() {
+            return mNewsLink;
+        }
+
+        public void setNewsLink(String mNewsLink) {
+            this.mNewsLink = mNewsLink;
         }
     }
 
@@ -121,6 +128,8 @@ public class NewsActivity extends AppCompatActivity{
             mListView.setAdapter(mListAdapter);
             mListAdapter.notifyDataSetChanged();
         }
+
+        mListView.setOnItemClickListener(mItemClickListener);
     }
 
     private void initNewsSettingPopup(){
@@ -282,11 +291,14 @@ public class NewsActivity extends AppCompatActivity{
         UtilLog.e("setNewsListView()");
         String[] title = NewsSetting.getResultTitle();
         String[] sub = NewsSetting.getResultDescription();
+        String[] link = NewsSetting.getResultLink();
+
         UtilLog.d("setNewsListView() : "+title.length);
         for(int i = 0; i < mSearchCount; i++){
             UtilLog.d("setNewsListView() mSearchCount: "+mSearchCount);
             UtilLog.d("setNewsListView() : "+title[i] +" , "+ sub[i]);
             mNewsItem = new NewsItem(title[i], sub[i]);
+            mNewsItem.setNewsLink(link[i]);
             mList.add(mNewsItem);
             mListAdapter.notifyDataSetChanged();
             mListView.setAdapter(mListAdapter);
@@ -308,6 +320,17 @@ public class NewsActivity extends AppCompatActivity{
             mHandler.removeMessages(NewsSetting.COMPLETED_GET_NEWS);
         }
     }
+
+    AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            String link = mListAdapter.getLink(position).toString();
+            UtilLog.e("link: "+link);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(link));
+            startActivity(intent);
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

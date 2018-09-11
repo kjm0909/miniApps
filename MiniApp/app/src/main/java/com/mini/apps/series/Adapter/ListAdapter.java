@@ -36,6 +36,10 @@ public class ListAdapter extends BaseAdapter {
         return null;
     }
 
+    public String getLink(int position){
+        return mList.get(position).getNewsLink();
+    }
+
     @Override
     public int getCount() {
         if(mList == null)
